@@ -11,7 +11,6 @@ struct                    \
   type *arr;              \
   size_t len;             \
   size_t rsize;           \
-  size_t type_size;       \
   void (* destr)(type *); \
 }                         \
 
@@ -35,8 +34,6 @@ struct                    \
 
 #define lvect_size(vector) ((vector).len)
 
-#define lvect_max_size(vector) ((vector).rsize)
-
 #define lvect_resize(vector, newsize) do {                                          \
   if (newsize != (vector).rsize) {                                                  \
     for (size_t i = newsize; i < (vector).len; ++i)                                 \
@@ -51,7 +48,7 @@ struct                    \
   }                                                                                 \
 } while (0)                                                                         \
 
-#define lvect_capacity(vector) ((vector).rsize * lvect_type_size(vector))
+#define lvect_capacity(vector) ((vector).rsize / lvect_type_size(vector))
 
 #define lvect_empty(vector) ((vector).len == 0)
 
