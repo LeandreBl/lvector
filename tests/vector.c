@@ -275,7 +275,7 @@ Test(lvector, emplace)
   cr_assert(v.arr != NULL);
   cr_assert(v.len == 2);
   cr_assert(v.rsize >= 2);
-  cr_assert(strcmp(v.arr[0], "Salut") == 0);
-  cr_assert(strcmp(v.arr[1], "empty-str") == 0);
+  cr_assert(strcmp(v.arr[0], "empty-str") == 0);
+  cr_assert(strcmp(v.arr[1], "Salut") == 0);
   lvector_destroy(v);
 }

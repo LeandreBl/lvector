@@ -135,7 +135,7 @@ struct                    \
 #define lvector_emplace(vector, position, function, ...) do {                                                                     \
   if (position < lvector_size(vector)) {                                                                                          \
     memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
-    function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);                                                                 \
+    function(&(vector).arr[position], ##__VA_ARGS__);                                                                 \
     ++(vector).len;                                                                                                               \
   }                                                                                                                               \
   else if (position == lvector_size(vector))                                                                                      \
