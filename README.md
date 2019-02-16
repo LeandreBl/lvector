@@ -4,6 +4,13 @@ A fast templated vector C implementation using macros (#define)
 `All those functions "works" as C++ std::vector class`
 
 ```C
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "lvector.h"
+
 /* a bunch of little functions, just to show multiple usages */
 static void free_str(char **pstr)
 {
