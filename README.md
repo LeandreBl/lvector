@@ -4,6 +4,27 @@ A fast templated vector C implementation using macros (#define)
 `All those functions "works" as C++ std::vector class`
 
 ```C
+/* a bunch of little functions, just to show multiple usages */
+static void free_str(char **pstr)
+{
+  free(*pstr);
+}
+
+static void str_allocator_nb(char **pdest, const char *src, size_t nb)
+{
+  asprintf(pdest, "[%zu] %s", nb, src);
+}
+
+static void duplicate_str(char **pdest, const char *str)
+{
+  *pdest = strdup(str);
+}
+
+static void copy_str(char **pdest, char **psrc)
+{
+  *pdest = strdup(*psrc);
+}
+
 int main(void)
 {
   lvector(char *) v;
