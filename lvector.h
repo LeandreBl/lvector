@@ -125,7 +125,7 @@ struct                    \
 
 #define lvector_emplace_back(vector, function, ...) do {            \
   if ((vector).len == (vector).rsize)                               \
-    lvector_resize(vector, (vector).rsize + LVECTOR_REALLOC_SIZE);  \
+    lvector_resize(vector, (vector).rsize * 2);                     \
   function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);     \
   ++(vector).len;                                                   \
 } while (0)                                                         \
