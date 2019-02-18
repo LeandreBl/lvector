@@ -3,6 +3,8 @@
 
 # include <stdlib.h>
 
+#define max(a, b) ((a >= b) ? a : b)
+
 #define lvector(type)     \
 struct                    \
 {                         \
@@ -79,7 +81,7 @@ struct                    \
 
 #define lvector_push_back(vector, new_item) do {                    \
   if ((vector).len == (vector).rsize)                               \
-    lvector_resize(vector, (vector).rsize * 2);                     \
+    lvector_resize(vector, max(1, (vector).rsize * 2));             \
   (vector).arr[(vector).len] = new_item;                            \
   ++(vector).len;                                                   \
 } while (0)                                                         \
@@ -125,7 +127,7 @@ struct                    \
 
 #define lvector_emplace_back(vector, function, ...) do {            \
   if ((vector).len == (vector).rsize)                               \
-    lvector_resize(vector, (vector).rsize * 2);                     \
+    lvector_resize(vector, max(1, (vector).rsize * 2));             \
   function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);     \
   ++(vector).len;                                                   \
 } while (0)                                                         \
