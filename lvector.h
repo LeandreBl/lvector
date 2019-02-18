@@ -3,8 +3,6 @@
 
 # include <stdlib.h>
 
-#define LVECTOR_REALLOC_SIZE (5)
-
 #define lvector(type)     \
 struct                    \
 {                         \
@@ -81,7 +79,7 @@ struct                    \
 
 #define lvector_push_back(vector, new_item) do {                    \
   if ((vector).len == (vector).rsize)                               \
-    lvector_resize(vector, (vector).rsize + LVECTOR_REALLOC_SIZE);  \
+    lvector_resize(vector, (vector).rsize * 2);                     \
   (vector).arr[(vector).len] = new_item;                            \
   ++(vector).len;                                                   \
 } while (0)                                                         \
