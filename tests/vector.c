@@ -18,7 +18,7 @@ Test(lvector, create0)
   lvector(int) v;
 
   lvector_create(v, 0, NULL);
-  //cr_assert(v.arr != NULL); depends on malloc implementation :/
+  /* cr_assert(v.arr != NULL); depends on malloc implementation :/ */
   cr_assert(v.destr == NULL);
   cr_assert(v.len == 0);
   cr_assert(v.rsize == 0);
@@ -237,6 +237,89 @@ Test(lvector, pop_back)
   cr_assert(v.len == 80);
   for (size_t i = 0; i < lvector_size(v); ++i)
     cr_assert(v.arr[i] == (int)i);
+  lvector_destroy(v);
+}
+
+Test(lvector, insert)
+{
+  lvector(int) v;
+
+  lvector_create(v, 10, NULL);
+  lvector_insert(v, 0, 34);
+  cr_assert(v.arr[0] == 34);
+  cr_assert(v.len == 1);
+  lvector_insert(v, 1, 73);
+  cr_assert(v.arr[0] == 34);
+  cr_assert(v.arr[1] == 73);
+  cr_assert(v.len == 2);
+  lvector_insert(v, 0, 123);
+  cr_assert(v.arr[0] == 123);
+  cr_assert(v.arr[1] == 34);
+  cr_assert(v.arr[2] == 73);
+  cr_assert(v.len == 3);
+  lvector_destroy(v);
+}
+
+Test(lvector, erase)
+{
+  lvector(int) v;
+
+  lvector_create(v, 10, NULL);
+  for (int i = 0; i < 10; ++i) {
+    lvector_push_back(v, i);
+  }
+  /* 0 -> 9 */
+  lvector_erase(v, 0);
+  /* 1 -> 9 */
+  cr_assert(v.len == 9);
+  cr_assert(v.arr[0] == 1);
+  lvector_erase(v, 8);
+  /* 1 -> 8 */
+  cr_assert(v.len == 8);
+  cr_assert(v.arr[7] == 8);
+  lvector_destroy(v);
+}
+
+Test(lvector, erase_item)
+{
+  lvector(int) v;
+
+  lvector_create(v, 10, NULL);
+  for (int i = 0; i < 10; ++i) {
+    lvector_push_back(v, i);
+  }
+  lvector_erase_item(v, 5);
+  cr_assert(v.len == 9);
+  for (size_t i = 0; i < lvector_size(v); ++i)
+    cr_assert(v.arr[i] != 5);
+  lvector_erase_item(v, 0);
+  cr_assert(v.len == 8);
+  for (size_t i = 0; i < lvector_size(v); ++i)
+    cr_assert(v.arr[i] != 0);
+  lvector_erase_item(v, 9);
+  cr_assert(v.len == 7);
+  for (size_t i = 0; i < lvector_size(v); ++i)
+    cr_assert(v.arr[i] != 9);
+  lvector_destroy(v);
+}
+static size_t count = 0;
+
+static void count_destr(int *var)
+{
+  cr_assert(var != NULL);
+  ++count;
+}
+
+Test(lvector, clear)
+{
+  lvector(int) v;
+
+  lvector_create(v, 1000, count_destr);
+  for (int i = 0; i < 1000; ++i)
+    lvector_push_back(v, i);
+  lvector_clear(v);
+  cr_assert(v.len == 0);
+  cr_assert(count == 1000);
   lvector_destroy(v);
 }
 
