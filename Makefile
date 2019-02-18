@@ -9,7 +9,7 @@ OBJS	= $(SRCS:.c=.o)
 
 RM	= rm -f
 
-CFLAGS	+= -Werror -Wall -Wextra -pedantic
+CFLAGS	+= -Werror -Wall -Wextra
 CFLAGS	+= -I.
 LDFLAGS += -lcriterion
 
