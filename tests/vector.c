@@ -10,7 +10,7 @@ Test(lvector, create10)
   cr_assert(v.arr != NULL);
   cr_assert(v.destr == NULL);
   cr_assert(v.len == 0);
-  cr_assert(v.rsize == 10 * sizeof(int));
+  cr_assert(v.rsize == 10);
 }
 
 Test(lvector, create0)

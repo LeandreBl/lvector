@@ -22,14 +22,14 @@ struct                    \
 
 #define lvector_type_size(vector) sizeof(*((vector).arr))
 
-#define lvector_create(vector, size, destructor) do { \
-  memset(&vector, 0, sizeof(vector));                 \
-  (vector).rsize = lvector_type_size(vector) * size;  \
-  (vector).arr = malloc((vector).rsize);              \
-  if ((vector).arr == NULL)                           \
-    memset(&(vector), 0, sizeof(vector));             \
-  (vector).len = 0;                                   \
-  (vector).destr = destructor;                        \
+#define lvector_create(vector, size, destructor) do {       \
+  memset(&vector, 0, sizeof(vector));                       \
+  (vector).rsize = size;                                    \
+  (vector).arr = malloc(lvector_type_size(vector) * size);  \
+  if ((vector).arr == NULL)                                 \
+    memset(&(vector), 0, sizeof(vector));                   \
+  (vector).len = 0;                                         \
+  (vector).destr = destructor;                              \
 } while (0)
 
 #define lvector_size(vector) ((vector).len)
@@ -48,7 +48,7 @@ struct                    \
   }                                                                                   \
 } while (0)
 
-#define lvector_capacity(vector) ((vector).rsize / lvector_type_size(vector))
+#define lvector_capacity(vector) ((vector).rsize)
 
 #define lvector_empty(vector) ((vector).len == 0)
 
