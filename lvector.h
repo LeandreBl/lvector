@@ -52,10 +52,10 @@ struct                    \
 
 #define lvector_empty(vector) ((vector).len == 0)
 
-#define lvector_reserve(vector, reserve_size) do {                \
-  if (lvector_capacity(vector) < reserve_size)                    \
-    lvector_resize(vector, reserve_size * lvector_type_size(v));  \
-} while (0)                                                       \
+#define lvector_reserve(vector, reserve_size) do {                    \
+  if (lvector_capacity(vector) < reserve_size)                        \
+    lvector_resize(vector, reserve_size * lvector_type_size(vector)); \
+} while (0)                                                           \
 
 #define lvector_shrink_to_fit(vector) do {      \
   lvector_resize(vector, lvector_size(vector)); \
