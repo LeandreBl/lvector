@@ -93,6 +93,8 @@ struct                    \
 
 #define lvector_insert(vector, position, new_item) do {                                                                           \
   if (position < lvector_size(vector)) {                                                                                          \
+    if ((vector).len == (vector).rsize)                                                                                           \
+      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                         \
     memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
     (vector).arr[position] = new_item;                                                                                            \
     ++(vector).len;                                                                                                               \
@@ -134,12 +136,25 @@ struct                    \
 
 #define lvector_emplace(vector, position, function, ...) do {                                                                     \
   if (position < lvector_size(vector)) {                                                                                          \
+    if ((vector).len == (vector).rsize)                                                                                           \
+      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                         \
     memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
     function(&(vector).arr[position], ##__VA_ARGS__);                                                                             \
     ++(vector).len;                                                                                                               \
   }                                                                                                                               \
   else if (position == lvector_size(vector))                                                                                      \
     lvector_emplace_back(vector, function, ##__VA_ARGS__);                                                                        \
+} while (0)
+
+#define lvector_spush_back(vector, new_item) do {                             \
+  for (size_t i = 0; i < lvector_size(vector); ++i) {                         \
+    if ((vector).arr[i] == new_item)                                          \
+      break;                                                                  \
+    else if (i == lvector_size(vector) - 1 && (vector).arr[i] != new_item) {  \
+      lvector_push_back(vector, new_item);                                    \
+      break;                                                                  \
+    }                                                                         \
+  }                                                                           \
 } while (0)
 
 #endif /* !_L_VECTOR_H_ */
