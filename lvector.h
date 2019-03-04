@@ -39,12 +39,13 @@ struct                    \
     for (size_t i = newsize; i < (vector).len; ++i)                                   \
       if ((vector).destr != NULL)                                                     \
         (vector).destr(&(vector).arr[i]);                                             \
-    (vector).rsize = newsize;                                                         \
-    if (newsize < (vector).len)                                                       \
-      (vector).len = newsize;                                                         \
-    (vector).arr = realloc((vector).arr, (vector).rsize * lvector_type_size(vector)); \
-    if ((vector).arr == NULL)                                                         \
-      memset(&(vector), 0, sizeof(vector));                                           \
+    void *p = realloc((vector).arr, newsize * lvector_type_size(vector));             \
+    if (p != NULL) {                                                                  \
+      (vector).rsize = newsize;                                                       \
+      (vector).arr = p;                                                               \
+      if (newsize < (vector).len)                                                     \
+        (vector).len = newsize;                                                       \
+    }                                                                                 \
   }                                                                                   \
 } while (0)
 
