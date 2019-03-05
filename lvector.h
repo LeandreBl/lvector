@@ -2,6 +2,7 @@
 # define _L_VECTOR_H_
 
 # include <stdlib.h>
+# include <string.h>
 
 #define max(a, b) ((a >= b) ? a : b)
 
