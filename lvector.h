@@ -84,8 +84,10 @@ struct                    \
 #define lvector_push_back(vector, new_item) do {                    \
   if ((vector).len == (vector).rsize)                               \
     lvector_resize(vector, max(1, (vector).rsize * 2));             \
-  (vector).arr[(vector).len] = new_item;                            \
-  ++(vector).len;                                                   \
+  if ((vector).len < (vector).rsize) {                              \
+    (vector).arr[(vector).len] = new_item;                          \
+    ++(vector).len;                                                 \
+  }                                                                 \
 } while (0)
 
 #define lvector_pop_back(vector) do {                   \
@@ -93,16 +95,18 @@ struct                    \
     lvector_erase(vector, (lvector_size(vector) - 1));  \
 } while (0)
 
-#define lvector_insert(vector, position, new_item) do {                                                                           \
-  if (position < lvector_size(vector)) {                                                                                          \
-    if ((vector).len == (vector).rsize)                                                                                           \
-      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                         \
-    memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
-    (vector).arr[position] = new_item;                                                                                            \
-    ++(vector).len;                                                                                                               \
-  }                                                                                                                               \
-  else if (position == lvector_size(vector))                                                                                      \
-    lvector_push_back(vector, new_item);                                                                                          \
+#define lvector_insert(vector, position, new_item) do {                                                                             \
+  if (position < lvector_size(vector)) {                                                                                            \
+    if ((vector).len == (vector).rsize)                                                                                             \
+      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                           \
+    if ((vector).len < (vector).rsize) {                                                                                            \
+      memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
+      (vector).arr[position] = new_item;                                                                                            \
+      ++(vector).len;                                                                                                               \
+    }                                                                                                                               \
+  }                                                                                                                                 \
+  else if (position == lvector_size(vector))                                                                                        \
+    lvector_push_back(vector, new_item);                                                                                            \
 } while (0)
 
 #define lvector_erase(vector, position) do {                                                                                          \
@@ -129,23 +133,27 @@ struct                    \
   (vector).len = 0;                                   \
 } while (0)
 
-#define lvector_emplace_back(vector, function, ...) do {            \
-  if ((vector).len == (vector).rsize)                               \
-    lvector_resize(vector, max(1, (vector).rsize * 2));             \
-  function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);     \
-  ++(vector).len;                                                   \
+#define lvector_emplace_back(vector, function, ...) do {          \
+  if ((vector).len == (vector).rsize)                             \
+    lvector_resize(vector, max(1, (vector).rsize * 2));           \
+  if ((vector).len < (vector).rsize) {                            \
+    function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__); \
+    ++(vector).len;                                               \
+  }                                                               \
 } while (0)
 
-#define lvector_emplace(vector, position, function, ...) do {                                                                     \
-  if (position < lvector_size(vector)) {                                                                                          \
-    if ((vector).len == (vector).rsize)                                                                                           \
-      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                         \
-    memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
-    function(&(vector).arr[position], ##__VA_ARGS__);                                                                             \
-    ++(vector).len;                                                                                                               \
-  }                                                                                                                               \
-  else if (position == lvector_size(vector))                                                                                      \
-    lvector_emplace_back(vector, function, ##__VA_ARGS__);                                                                        \
+#define lvector_emplace(vector, position, function, ...) do {                                                                       \
+  if (position < lvector_size(vector)) {                                                                                            \
+    if ((vector).len == (vector).rsize)                                                                                             \
+      lvector_resize(vector, max(1, (vector).rsize * 2));                                                                           \
+    if ((vector).len < (vector).rsize) {                                                                                            \
+      memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
+      function(&(vector).arr[position], ##__VA_ARGS__);                                                                             \
+      ++(vector).len;                                                                                                               \
+    }                                                                                                                               \
+  }                                                                                                                                 \
+  else if (position == lvector_size(vector))                                                                                        \
+    lvector_emplace_back(vector, function, ##__VA_ARGS__);                                                                          \
 } while (0)
 
 #define lvector_spush_back(vector, new_item) do {                             \
