@@ -260,6 +260,20 @@ Test(lvector, insert)
   lvector_destroy(v);
 }
 
+Test(lvector, erase_item_str)
+{
+  lvector(char *) v;
+  char *s;
+
+  lvector_create(v, 10, free_str);
+  for (int i = 0; i < 10; ++i) {
+    s = strdup("salut");
+    lvector_push_back(v, s);
+  }
+  lvector_erase_item(v, s);
+  lvector_destroy(v);
+}
+
 Test(lvector, erase)
 {
   lvector(int) v;
