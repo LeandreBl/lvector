@@ -10,7 +10,10 @@
 struct                    \
 {                         \
   type *arr;              \
-  size_t len;             \
+  union {                 \
+    size_t len;           \
+    size_t size;          \
+  }                       \
   size_t rsize;           \
   void (* destr)(type *); \
 }
