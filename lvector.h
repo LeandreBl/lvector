@@ -70,7 +70,7 @@ struct                    \
 
 #define lvector_front(vector) (&(vector).arr[0])
 
-#define lvector_back(vector) ((vector.len != 0) ? (&(vector).arr[(vector).len - 1]) : NULL
+#define lvector_back(vector) ((vector.len != 0) ? (&(vector).arr[(vector).len - 1]) : NULL)
 
 #define lvector_data(vector) ((vector).arr)
 
