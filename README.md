@@ -1,7 +1,7 @@
 # lvector
 A fast templated vector C implementation using macros (#define)
 
-`All those functions "works" as C++ std::vector class`
+`All those functions "works" as C++ std::vector class (but faster cause we're better)`
 
 ```C
 #define _GNU_SOURCE
