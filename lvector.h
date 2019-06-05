@@ -159,6 +159,18 @@
       }                                                     \
   } while (0)
 
+#define lvector_erase_from_ptr(vector, ptr)                                          \
+  do                                                                                 \
+  {                                                                                  \
+    if (ptr >= lvector_front(vector) && ptr <= lvector_back(vector))                 \
+    {                                                                                \
+      if ((vector).destr != NULL)                                                    \
+        (vector).destr(ptr);                                                         \
+      memmove(ptr, ptr + 1, lvector_back(vector) - ptr + lvector_type_size(vector)); \
+      --(vector).len;                                                                \
+    }                                                                                \
+  } while (0)
+
 #define lvector_clear(vector)                                 \
   do                                                          \
   {                                                           \
