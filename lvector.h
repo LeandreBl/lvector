@@ -180,16 +180,17 @@
     (vector).len = 0;                                         \
   } while (0)
 
-#define lvector_emplace_back(vector, function, ...)                 \
-  do                                                                \
-  {                                                                 \
-    if ((vector).len == (vector).rsize)                             \
-      lvector_resize(vector, max(1, (vector).rsize * 2));           \
-    if ((vector).len < (vector).rsize)                              \
-    {                                                               \
-      function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__); \
-      ++(vector).len;                                               \
-    }                                                               \
+#define lvector_emplace_back(vector, function, ...)                          \
+  do                                                                         \
+  {                                                                          \
+    if ((vector).len == (vector).rsize)                                      \
+      lvector_resize(vector, max(1, (vector).rsize * 2));                    \
+    if ((vector).len < (vector).rsize)                                       \
+    {                                                                        \
+      memset(&(vector).arr[lvector_size(vector)], 0, sizeof(*(vector).arr)); \
+      function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);          \
+      ++(vector).len;                                                        \
+    }                                                                        \
   } while (0)
 
 #define lvector_emplace(vector, position, function, ...)                                                                              \
@@ -202,6 +203,7 @@
       if ((vector).len < (vector).rsize)                                                                                              \
       {                                                                                                                               \
         memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
+        memset(&(vector).arr[position], 0, sizeof(*(vector).arr));                                                                    \
         function(&(vector).arr[position], ##__VA_ARGS__);                                                                             \
         ++(vector).len;                                                                                                               \
       }                                                                                                                               \
