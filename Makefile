@@ -9,7 +9,7 @@ OBJS	= $(SRCS:.c=.o)
 
 RM	= rm -f
 
-CFLAGS	+= -Werror -Wall -Wextra
+CFLAGS	+= -Werror -Wall -Wextra -g3
 CFLAGS	+= -I.
 LDFLAGS += -lcriterion
 
@@ -27,7 +27,6 @@ tests_run: $(OBJS)
 	["$(GREEN)"LINKING OK"$(NO_COLOR)"]"
 	./$(NAME)
 
-val_run: CFLAGS += -g3
 val_run: $(OBJS)
 	@$ $(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
 	@echo "$(CC) $(OBJS) $(LDFLAGS) -o $(NAME) \

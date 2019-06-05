@@ -15,7 +15,7 @@
       size_t size;         \
     };                     \
     size_t rsize;          \
-    void (* destr)(type *);\
+    void (*destr)(type *); \
   }
 
 #define lvector_destroy(vector)         \
@@ -49,9 +49,9 @@
       lvector_clear(vector);                                                \
     else if (newsize != (vector).rsize)                                     \
     {                                                                       \
-      for (size_t __ = newsize; __ < (vector).len; ++__)                    \
+      for (size_t i__ = newsize; i__ < (vector).len; ++i__)                 \
         if ((vector).destr != NULL)                                         \
-          (vector).destr(&(vector).arr[__]);                                \
+          (vector).destr(&(vector).arr[i__]);                               \
       void *p = realloc((vector).arr, newsize * lvector_type_size(vector)); \
       if (p != NULL)                                                        \
       {                                                                     \
@@ -82,21 +82,20 @@
 
 #define lvector_front(vector) (&(vector).arr[0])
 
-#define lvector_back(vector) ((vector.len != 0) ? (&(vector).arr[(vector).len - 1]) : NULL)
+#define lvector_back(vector) (&(vector).arr[(vector).len - 1])
 
 #define lvector_data(vector) ((vector).arr)
 
 #define lvector_assign(vector_dest, vector_src, copier)                        \
   do                                                                           \
   {                                                                            \
-    lvector_destroy(vector_dest);                                              \
     lvector_create(vector_dest, lvector_size(vector_src), (vector_src).destr); \
     if (copier != NULL)                                                        \
-      for (size_t __ = 0; __ < lvector_size(vector_src); ++__)                 \
-        copier(&(vector_dest).arr[__], &(vector_src).arr[__]);                 \
+      for (size_t i__ = 0; i__ < lvector_size(vector_src); ++i__)              \
+        copier(&(vector_dest).arr[i__], &(vector_src).arr[i__]);               \
     else                                                                       \
-      for (size_t __ = 0; __ < lvector_size(vector_src); ++__)                 \
-        (vector_dest).arr[__] = (vector_src).arr[__];                          \
+      for (size_t i__ = 0; i__ < lvector_size(vector_src); ++i__)              \
+        (vector_dest).arr[i__] = (vector_src).arr[i__];                        \
     (vector_dest).len = lvector_size(vector_src);                              \
   } while (0)
 
@@ -149,24 +148,24 @@
     }                                                                                                                                   \
   } while (0)
 
-#define lvector_erase_item(vector, item)                 \
-  do                                                     \
-  {                                                      \
-    for (size_t __ = 0; __ < lvector_size(vector); ++__) \
-      if ((vector).arr[__] == item)                      \
-      {                                                  \
-        lvector_erase(vector, __);                       \
-        break;                                           \
-      }                                                  \
+#define lvector_erase_item(vector, item)                    \
+  do                                                        \
+  {                                                         \
+    for (size_t i__ = 0; i__ < lvector_size(vector); ++i__) \
+      if ((vector).arr[i__] == item)                        \
+      {                                                     \
+        lvector_erase(vector, i__);                         \
+        break;                                              \
+      }                                                     \
   } while (0)
 
-#define lvector_clear(vector)                              \
-  do                                                       \
-  {                                                        \
-    if ((vector).destr != NULL)                            \
-      for (size_t __ = 0; __ < lvector_size(vector); ++__) \
-        ((vector).destr(&(vector).arr[__]));               \
-    (vector).len = 0;                                      \
+#define lvector_clear(vector)                                 \
+  do                                                          \
+  {                                                           \
+    if ((vector).destr != NULL)                               \
+      for (size_t i__ = 0; i__ < lvector_size(vector); ++i__) \
+        ((vector).destr(&(vector).arr[i__]));                 \
+    (vector).len = 0;                                         \
   } while (0)
 
 #define lvector_emplace_back(vector, function, ...)                 \
@@ -199,19 +198,31 @@
       lvector_emplace_back(vector, function, ##__VA_ARGS__);                                                                          \
   } while (0)
 
-#define lvector_spush_back(vector, new_item)                                   \
-  do                                                                           \
-  {                                                                            \
-    for (size_t __ = 0; __ < lvector_size(vector); ++__)                       \
-    {                                                                          \
-      if ((vector).arr[__] == new__tem)                                        \
-        break;                                                                 \
-      else if (__ == lvector_size(vector) - 1 && (vector).arr[__] != new_item) \
-      {                                                                        \
-        lvector_push_back(vector, new_item);                                   \
-        break;                                                                 \
-      }                                                                        \
-    }                                                                          \
+#define lvector_spush_back(vector, new_item)                                     \
+  do                                                                             \
+  {                                                                              \
+    for (size_t i__ = 0; i__ < lvector_size(vector); ++i__)                      \
+    {                                                                            \
+      if ((vector).arr[i__] == new_item)                                         \
+        break;                                                                   \
+      else if (i__ == lvector_size(vector) - 1 && (vector).arr[i__] != new_item) \
+      {                                                                          \
+        lvector_push_back(vector, new_item);                                     \
+        break;                                                                   \
+      }                                                                          \
+    }                                                                            \
   } while (0)
+
+#define lvector_foreach(item_name, vector) \
+  for (__typeof__((vector).arr) item_name = lvector_front(vector); item_name <= lvector_back(vector); ++item_name)
+
+#define lvector_backward_foreach(item_name, vector) \
+  for (__typeof__((vector).arr) item_name = lvector_back(vector); item_name >= lvector_front(vector); --item_name)
+
+#define lvector_for(index_name, vector) \
+  for (size_t index_name = 0; index_name < lvector_size(vector); ++index_name)
+
+#define lvector_backward_for(index_name, vector) \
+  for (ssize_t index_name = lvector_size(vector) - 1; index_name >= 0; --index_name)
 
 #endif /* !_L_VECTOR_H_ */

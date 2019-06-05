@@ -181,7 +181,7 @@ Test(lvector, data)
   lvector_destroy(v);
 }
 
-static void string_copier(char **dest, char **src)
+static void string_copier(char **dest, char *const *src)
 {
   *dest = strdup(*src);
 }
@@ -189,7 +189,7 @@ static void string_copier(char **dest, char **src)
 Test(lvector, assign)
 {
   lvector(char *) v;
-  lvector(char *) dup = { 0 };
+  lvector(char *) dup = {0};
 
   lvector_create(v, 10, free_str);
   lvector_push_back(v, strdup("Hello"));
@@ -316,12 +316,12 @@ Test(lvector, erase_item)
     cr_assert(v.arr[i] != 9);
   lvector_destroy(v);
 }
-static size_t count = 0;
+static size_t s_count = 0;
 
 static void count_destr(int *var)
 {
   cr_assert(var != NULL);
-  ++count;
+  ++s_count;
 }
 
 Test(lvector, clear)
@@ -333,7 +333,7 @@ Test(lvector, clear)
     lvector_push_back(v, i);
   lvector_clear(v);
   cr_assert(v.len == 0);
-  cr_assert(count == 1000);
+  cr_assert(s_count == 1000);
   lvector_destroy(v);
 }
 
@@ -357,8 +357,8 @@ Test(lvector, emplace_back)
   cr_assert(v.arr != NULL);
   cr_assert(v.len == 2);
   cr_assert(v.rsize >= 2);
-  cr_assert(strcmp(v.arr[0], "Salut") == 0);
-  cr_assert(strcmp(v.arr[1], "empty-str") == 0);
+  cr_assert_str_eq(v.arr[0], "Salut");
+  cr_assert_str_eq(v.arr[1], "empty-str");
   lvector_destroy(v);
 }
 
@@ -372,7 +372,62 @@ Test(lvector, emplace)
   cr_assert(v.arr != NULL);
   cr_assert(v.len == 2);
   cr_assert(v.rsize >= 2);
-  cr_assert(strcmp(v.arr[0], "empty-str") == 0);
-  cr_assert(strcmp(v.arr[1], "Salut") == 0);
+  cr_assert_str_eq(v.arr[0], "empty-str");
+  cr_assert_str_eq(v.arr[1], "Salut");
   lvector_destroy(v);
+}
+
+Test(lvector, foreach)
+{
+  lvector(char *) v;
+  size_t count = 0;
+
+  lvector_create(v, 10, free_str);
+  lvector_emplace_back(v, dup_str, "toto0");
+  lvector_emplace_back(v, dup_str, "toto1");
+  lvector_emplace_back(v, dup_str, "toto2");
+  lvector_emplace_back(v, dup_str, "toto3");
+  lvector_emplace_back(v, dup_str, "toto4");
+
+  lvector_foreach(pstr, v) {
+    cr_assert(strncmp(*pstr, "toto", 4) == 0);
+    cr_assert((*pstr)[4] == '0' + (int)count);
+    (*pstr)[0] = 'b';
+    ++count;
+  }
+  cr_assert(count == v.len);
+  count = 0;
+  lvector_foreach(pstr, v) {
+    cr_assert(strncmp(*pstr, "boto", 4) == 0);
+    cr_assert((*pstr)[4] == '0' + (int)count);
+    ++count;
+  }
+  cr_assert(count == v.len);
+  lvector_destroy(v);
+}
+
+Test(lvector, lvector_foreach_backward)
+{
+  lvector(size_t) v = {0};
+  size_t count = 0;
+
+  for (size_t i = 0; i < 10; ++i)
+    lvector_push_back(v, i);
+  lvector_backward_foreach(val, v) {
+    cr_assert(*val == 10 - count - 1);
+    ++count;
+  }
+  cr_assert(count == 10);
+  lvector_destroy(v);
+}
+
+Test(lvector, lvector_for)
+{
+  lvector(size_t) v = {0};
+
+  for (size_t i = 0; i < v.len; ++i)
+    lvector_data(v)[i] = i;
+  lvector_for(i, v) {
+    cr_assert(lvector_data(v)[i] == i);
+  }
 }

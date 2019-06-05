@@ -27,7 +27,7 @@ static void duplicate_str(char **pdest, const char *str)
   *pdest = strdup(str);
 }
 
-static void copy_str(char **pdest, char **psrc)
+static void copy_str(char **pdest, char *const *psrc)
 {
   *pdest = strdup(*psrc);
 }
@@ -37,21 +37,26 @@ int main(void)
   lvector(char *) v;
   lvector(char *) duplicate = { 0 }; /* Create an empty vector, without lvector_create call */
 
+  /* create a vector of size 0, with 'free_str' function as destructor */
   lvector_create(v, 0, free_str);
 
+  /* push the return of 'strdup' at the end of the vector */
   lvector_push_back(v, strdup("General Kenobi ..."));
-  lvector_emplace_back(v, duplicate_str, "Who the f*** is Thomas Rue");
+  /* call the 'duplicate_str' function on the new vector internal object */
+  lvector_emplace_back(v, duplicate_str, "Who the f*** is Thomas Rue ?!");
+  /* same as above but with 'str_allocator_nb', but insert the object at index 0 */
   lvector_emplace(v, 0, str_allocator_nb, "Hello there !", 42);
 
-  for (size_t i = 0; i < v.len; ++i) {
-    printf("%s\n", v.arr[i]);
+  /* foreach example, gives the address of the inside item */
+  lvector_foreach(str, v) {
+    printf("%s\n", *str);
   }
-
   lvector_assign(duplicate, v, copy_str);
   lvector_destroy(v);
 
   printf("----------------------\n");
-  for (size_t i = 0; i < duplicate.len; ++i) {
+  /* lvector_for example, gives a usable index, named by the user */
+  lvector_for(i, duplicate) {
     printf("%s\n", duplicate.arr[i]);
   }
 
