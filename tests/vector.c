@@ -181,9 +181,10 @@ Test(lvector, data)
   lvector_destroy(v);
 }
 
-static void string_copier(char **dest, char *const *src)
+static int string_copier(char **dest, char *const *src)
 {
   *dest = strdup(*src);
+  return (!(*dest));
 }
 
 Test(lvector, assign)
@@ -337,14 +338,16 @@ Test(lvector, clear)
   lvector_destroy(v);
 }
 
-static void dup_str(char **s, const char *str)
+static int dup_str(char **s, const char *str)
 {
   *s = strdup(str);
+  return (!(*s));
 }
 
-static void empty_str(char **s)
+static int empty_str(char **s)
 {
   *s = strdup("empty-str");
+  return (!(*s));
 }
 
 Test(lvector, emplace_back)

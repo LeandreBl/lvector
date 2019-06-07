@@ -1,5 +1,5 @@
-#ifndef _L_VECTOR_H_
-#define _L_VECTOR_H_
+#ifndef L_VECTOR_H_
+#define L_VECTOR_H_
 
 #include <stdlib.h>
 #include <string.h>
@@ -91,13 +91,24 @@
   {                                                                            \
     lvector_create(vector_dest, lvector_size(vector_src), (vector_src).destr); \
     if (copier != NULL)                                                        \
-      for (size_t i__ = 0; i__ < lvector_size(vector_src); ++i__)              \
-        copier(&(vector_dest).arr[i__], &(vector_src).arr[i__]);               \
+    {                                                                          \
+      size_t i__ = 0;                                                          \
+      lvector_foreach(obj, vector_src)                                         \
+      {                                                                        \
+        if (!copier(&(vector_dest).arr[i__], obj))                             \
+          ++i__;                                                               \
+      }                                                                        \
+    }                                                                          \
     else                                                                       \
+    {                                                                          \
       for (size_t i__ = 0; i__ < lvector_size(vector_src); ++i__)              \
         (vector_dest).arr[i__] = (vector_src).arr[i__];                        \
+    }                                                                          \
     (vector_dest).len = lvector_size(vector_src);                              \
   } while (0)
+
+#define lvector_copy(vector_dest, vector_src, copier) \
+  lvector_assign(vector_dest, vector_src, copier)
 
 #define lvector_push_back(vector, new_item)               \
   do                                                      \
@@ -188,8 +199,8 @@
     if ((vector).len < (vector).rsize)                                       \
     {                                                                        \
       memset(&(vector).arr[lvector_size(vector)], 0, sizeof(*(vector).arr)); \
-      function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__);          \
-      ++(vector).len;                                                        \
+      if (!function(&(vector).arr[lvector_size(vector)], ##__VA_ARGS__))     \
+        ++(vector).len;                                                      \
     }                                                                        \
   } while (0)
 
@@ -204,8 +215,8 @@
       {                                                                                                                               \
         memmove(&(vector).arr[position + 1], &(vector).arr[position], (lvector_size(vector) - position) * lvector_type_size(vector)); \
         memset(&(vector).arr[position], 0, sizeof(*(vector).arr));                                                                    \
-        function(&(vector).arr[position], ##__VA_ARGS__);                                                                             \
-        ++(vector).len;                                                                                                               \
+        if (!function(&(vector).arr[position], ##__VA_ARGS__))                                                                        \
+          ++(vector).len;                                                                                                             \
       }                                                                                                                               \
     }                                                                                                                                 \
     else if (position == lvector_size(vector))                                                                                        \
@@ -239,4 +250,4 @@
 #define lvector_backward_for(index_name, vector) \
   for (ssize_t index_name = lvector_size(vector) - 1; index_name >= 0; --index_name)
 
-#endif /* !_L_VECTOR_H_ */
+#endif /* !L_VECTOR_H_ */
