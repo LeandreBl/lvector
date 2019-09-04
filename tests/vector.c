@@ -431,10 +431,23 @@ Test(lvector, lvector_for)
 {
 	lvector(size_t) v = {0};
 
-	for (size_t i = 0; i < v.len; ++i)
-		lvector_data(v)[i] = i;
+	for (size_t i = 0; i < 10; ++i)
+                lvector_push_back(v, i);
 	lvector_for(i, v)
 	{
-		cr_assert(lvector_data(v)[i] == i);
+		cr_assert(v.arr[i] == i);
 	}
+}
+
+Test(lvector, lvector_spush_back)
+{
+        lvector(size_t) v = {0};
+
+        for (size_t i = 0; i < 5; ++i)
+                lvector_spush_back(v, i);
+        cr_assert(v.len == 5);
+        lvector_for(i, v)
+        {
+                cr_assert(v.arr[i] == i);
+        }
 }
