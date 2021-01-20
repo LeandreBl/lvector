@@ -224,6 +224,22 @@ Test(lvector, push_back)
 	lvector_destroy(v);
 }
 
+Test(lvector, push_front)
+{
+	lvector(int) v;
+
+	lvector_create(v, 0, NULL);
+	for (size_t i = 0; i < 100; ++i) {
+		cr_assert(v.len == i);
+		lvector_push_front(v, i);
+		cr_assert(v.rsize >= i);
+	}
+	cr_assert(v.len == 100);
+	for (size_t i = 0; i < lvector_size(v); ++i)
+		cr_assert(v.arr[i] == 99 - (int)i);
+	lvector_destroy(v);
+}
+
 Test(lvector, pop_back)
 {
 	lvector(int) v;
