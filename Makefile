@@ -44,5 +44,7 @@ install:
 	printf "\033[1m\033[32mLibrary successfull installed !\033[0m\n" || \
 	printf "\033[1m\033[31mError : try sudo make install\033[0m\n"
 
+static:
+	echo "Not supported"
 
 .PHONY: tests_run val_run clean fclean install
