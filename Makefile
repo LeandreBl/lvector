@@ -10,7 +10,7 @@ OBJS	= $(SRCS:.c=.o)
 RM	= rm -f
 
 CFLAGS	+= -Werror -Wall -Wextra -g3
-CFLAGS	+= -I.
+CFLAGS	+= -I./include
 LDFLAGS += -lcriterion
 
 GREEN	= '\033[0;32m'
@@ -40,7 +40,7 @@ fclean: clean
 	$(RM) $(NAME)
 
 install:
-	@cp lvector.h /usr/local/include 2> /dev/null && \
+	@cp ./include/lvector.h /usr/local/include 2> /dev/null && \
 	printf "\033[1m\033[32mLibrary successfull installed !\033[0m\n" || \
 	printf "\033[1m\033[31mError : try sudo make install\033[0m\n"
 
