@@ -43,7 +43,7 @@ fclean: clean
 
 install:
 	@cp ./include/lvector.h /usr/local/include 2> /dev/null && \
-	printf "\033[1m\033[32mLibrary successfull installed !\033[0m\n" || \
+	printf "\033[1m\033[32mLibrary lvector successfully installed !\033[0m\n" || \
 	printf "\033[1m\033[31mError : try sudo make install\033[0m\n"
 
 static:
