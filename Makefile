@@ -13,8 +13,10 @@ CFLAGS	+= -Werror -Wall -Wextra -g3
 CFLAGS	+= -I./include
 LDFLAGS += -lcriterion
 
-GREEN	= '\033[0;32m'
-NO_COLOR	= '\033[0m'
+GREEN = `tput setaf 2`
+RED = `tput setaf 1`
+YELLOW = `tput setaf 3`
+NO_COLOR = `tput sgr0`
 
 %.o : %.c
 	@$ $(CC) $(CFLAGS) -c $< -o $@
