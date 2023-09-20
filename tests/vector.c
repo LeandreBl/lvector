@@ -584,3 +584,25 @@ Test(lvector, lvector_macro_find_if)
 	cr_assert(*pfind == to_find);
 	lvector_destroy(v);
 }
+
+Test(lvector, lvector_erase_from_ptr)
+{
+	lvector(size_t) v = {0};
+	size_t *p;
+	size_t value;
+	size_t idx;
+
+	cr_assert(lvector_create(v, 0, NULL) == 0);
+	for (size_t i = 0; i < 2000; ++i) {
+		cr_assert(lvector_push_back(v, i) == 0);
+	}
+	srand((unsigned int)(long)&v);
+	for (size_t i = 0; i < 200; ++i) {
+		idx = rand() % v.len;
+		p = &v.arr[idx];
+		value = *p;
+		cr_assert(lvector_erase_from_ptr(v, p) == 0);
+		cr_assert(lvector_macro_find_if(v, item, *item == value) == NULL);
+	}
+	lvector_destroy(v);
+}
