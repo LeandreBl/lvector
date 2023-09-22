@@ -1,9 +1,9 @@
 #ifndef L_VECTOR_H_
 #define L_VECTOR_H_
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 #define max(a, b) ((a >= b) ? a : b)
 
@@ -180,7 +180,9 @@
   })
 
 #define lvector_erase(vector, position)                                        \
-  {                                                                            \
+  ({                                                                           \
+    int __lvector_erase_ret = 0;                                               \
+                                                                               \
     if (position < lvector_size(vector)) {                                     \
       if ((vector).destr != NULL)                                              \
         (vector).destr(&(vector).arr[position]);                               \
@@ -188,8 +190,12 @@
               (lvector_size(vector) - position - 1) *                          \
                   lvector_type_size(vector));                                  \
       --(vector).len;                                                          \
+      __lvector_erase_ret = 0;                                                 \
+    } else {                                                                   \
+      __lvector_erase_ret = -1;                                                \
     }                                                                          \
-  }
+    __lvector_erase_ret;                                                       \
+  })
 
 #define lvector_erase_item(vector, item)                                       \
   {                                                                            \
@@ -203,21 +209,8 @@
   }
 
 #define lvector_erase_from_ptr(vector, ptr)                                    \
-  ({                                                                           \
-    int __lvector_erase_from_ptr_ret = 0;                                      \
-                                                                               \
-    if (ptr >= lvector_front(vector) && ptr <= lvector_back(vector)) {         \
-      if ((vector).destr != NULL)                                              \
-        (vector).destr(ptr);                                                   \
-      memmove(ptr, ptr + 1,                                                    \
-              (uintptr_t) lvector_back(vector) - (uintptr_t)ptr + lvector_type_size(vector));         \
-      --(vector).len;                                                          \
-      __lvector_erase_from_ptr_ret = 0;                                        \
-    } else {                                                                   \
-      __lvector_erase_from_ptr_ret = -1;                                       \
-    }                                                                          \
-    __lvector_erase_from_ptr_ret;                                              \
-  })
+  lvector_erase(vector, ((uintptr_t)ptr - (uintptr_t)lvector_front(vector)) /  \
+                            lvector_type_size(vector))
 
 #define lvector_erase_if(vector, condition_function, ...)                      \
   ({                                                                           \
