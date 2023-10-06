@@ -157,6 +157,12 @@
       lvector_erase(vector, (lvector_size(vector) - 1));                       \
   }
 
+#define lvector_pop_front(vector)                                              \
+  {                                                                            \
+    if (lvector_size(vector) != 0)                                             \
+      lvector_erase(vector, 0);                                                \
+  }
+
 #define lvector_insert(vector, position, new_item)                             \
   ({                                                                           \
     int __lvector_insert_ret = 0;                                              \
@@ -197,6 +203,22 @@
     __lvector_erase_ret;                                                       \
   })
 
+#define lvector_erase_no_destructor(vector, position)                          \
+  ({                                                                           \
+    int __lvector_erase_no_destructor_ret = 0;                                 \
+                                                                               \
+    if (position < lvector_size(vector)) {                                     \
+      memmove(&(vector).arr[position], &(vector).arr[position + 1],            \
+              (lvector_size(vector) - position - 1) *                          \
+                  lvector_type_size(vector));                                  \
+      --(vector).len;                                                          \
+      __lvector_erase_no_destructor_ret = 0;                                   \
+    } else {                                                                   \
+      __lvector_erase_no_destructor_ret = -1;                                  \
+    }                                                                          \
+    __lvector_erase_no_destructor_ret;                                         \
+  })
+
 #define lvector_erase_item(vector, item)                                       \
   {                                                                            \
     for (size_t __lvector_erase_item_iterator = 0;                             \
@@ -208,8 +230,23 @@
       }                                                                        \
   }
 
+#define lvector_erase_item_no_destructor(vector, item)                                       \
+  {                                                                                          \
+    for (size_t __lvector_erase_item_no_destructor_iterator = 0;                             \
+         __lvector_erase_item_no_destructor_iterator < lvector_size(vector);                 \
+         ++__lvector_erase_item_no_destructor_iterator)                                      \
+      if ((vector).arr[__lvector_erase_item_no_destructor_iterator] == item) {               \
+        lvector_erase_no_destructor(vector, __lvector_erase_item_no_destructor_iterator);    \
+        break;                                                                               \
+      }                                                                                      \
+  }
+
 #define lvector_erase_from_ptr(vector, ptr)                                    \
   lvector_erase(vector, ((uintptr_t)ptr - (uintptr_t)lvector_front(vector)) /  \
+                            lvector_type_size(vector))
+
+#define lvector_erase_from_ptr_no_destructor(vector, ptr)                                    \
+  lvector_erase_no_destructor(vector, ((uintptr_t)ptr - (uintptr_t)lvector_front(vector)) /  \
                             lvector_type_size(vector))
 
 #define lvector_erase_if(vector, condition_function, ...)                      \
@@ -228,6 +265,22 @@
     (__lvector_erase_if_original_count - lvector_size(vector));                \
   })
 
+#define lvector_erase_if_no_destructor(vector, condition_function, ...)            \
+  ({                                                                               \
+    size_t __lvector_erase_if_no_destructor_original_count = lvector_size(vector); \
+                                                                                   \
+    for (size_t __lvector_erase_if_no_destructor_iterator = 0;                                   \
+         __lvector_erase_if_no_destructor_iterator < lvector_size(vector);) {                    \
+      if (condition_function(&(vector).arr[__lvector_erase_if_no_destructor_iterator],           \
+                             ##__VA_ARGS__) == 0) {                                \
+        lvector_erase_no_destructor(vector, __lvector_erase_if_no_destructor_iterator);          \
+      } else {                                                                     \
+        ++__lvector_erase_if_no_destructor_iterator;                                             \
+      }                                                                            \
+    }                                                                              \
+    (__lvector_erase_if_no_destructor_original_count - lvector_size(vector));      \
+  })
+
 #define lvector_macro_erase_if(vector, item_name, condition)                   \
   ({                                                                           \
     size_t __lvector_macro_erase_if_original_count = lvector_size(vector);     \
@@ -243,6 +296,23 @@
       }                                                                        \
     }                                                                          \
     (__lvector_macro_erase_if_original_count - lvector_size(vector));          \
+  })
+
+#define lvector_macro_erase_if_no_destructor(vector, item_name, condition)     \
+  ({                                                                           \
+    size_t __lvector_macro_erase_if_no_destructor_original_count = lvector_size(vector);     \
+                                                                               \
+    for (size_t __lvector_macro_erase_if_iterator = 0;                         \
+         __lvector_macro_erase_if_iterator < lvector_size(vector);) {          \
+      const __typeof__((*vector.arr)) *item_name =                             \
+          &v.arr[__lvector_macro_erase_if_iterator];                           \
+      if (condition) {                                                         \
+        lvector_erase_no_destructor(vector, __lvector_macro_erase_if_iterator);\
+      } else {                                                                 \
+        ++__lvector_macro_erase_if_iterator;                                   \
+      }                                                                        \
+    }                                                                          \
+    (__lvector_macro_erase_if_no_destructor_original_count - lvector_size(vector));          \
   })
 
 #define lvector_find_if(vector, condition_function, ...)                       \
